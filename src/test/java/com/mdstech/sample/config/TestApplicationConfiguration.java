@@ -9,6 +9,7 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
@@ -57,7 +58,10 @@ public class TestApplicationConfiguration {
         em.setDataSource(dataSource());
         em.setPackagesToScan(new String[] { "com.mdstech.sample.common", "com.mdstech.sample.samplejob1" });
 
-        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        vendorAdapter.setShowSql(true);
+        vendorAdapter.setDatabase(Database.H2);
+        vendorAdapter.setGenerateDdl(true);
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(additionalProperties());
         return em;

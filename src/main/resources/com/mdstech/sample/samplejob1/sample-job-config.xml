@@ -1,0 +1,48 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+    http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+">
+
+    <bean id="itemReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader">
+
+        <property name="resource" value="input/record.csv" />
+
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class=
+                                  "org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names" value="username,userid,transactiondate,amount" />
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="com.mdstech.sample.samplejob1.RecordFieldSetMapper" />
+                </property>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="1" />
+    </bean>
+
+    <bean id="itemProcessor"
+          class="com.mdstech.sample.samplejob1.CustomItemProcessor" />
+
+    <bean id="itemWriter"
+          class="com.mdstech.sample.samplejob1.CustomWriter">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+    <batch:job id="firstBatchJob">
+        <batch:step id="step1">
+            <batch:tasklet>
+                <batch:chunk reader="itemReader" writer="itemWriter"
+                             processor="itemProcessor" commit-interval="10">
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+</beans>

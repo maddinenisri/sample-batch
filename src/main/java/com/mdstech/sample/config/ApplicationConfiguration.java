@@ -1,15 +1,14 @@
 package com.mdstech.sample.config;
 
 import com.mdstech.sample.samplejob1.SampleJob1Config;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.batch.core.scope.StepScope;
+import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -26,6 +25,7 @@ import java.util.Properties;
 @EnableJpaRepositories(basePackages = {"com.mdstech.sample.common"})
 @EnableBatchProcessing
 @Import({SampleJob1Config.class})
+//@ImportResource({"classpath:com/mdstech/sample/samplejob1/sample-job-config.xml"})
 @ComponentScan(basePackages = {"com.mdstech.sample"})
 public class ApplicationConfiguration {
 
@@ -49,7 +49,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public PlatformTransactionManager getTransactionManager(EntityManagerFactory emf) {
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         JpaTransactionManager platformTransactionManager = new JpaTransactionManager();
         platformTransactionManager.setEntityManagerFactory(emf);
         return platformTransactionManager;
@@ -62,18 +62,27 @@ public class ApplicationConfiguration {
         return properties;
     }
 
-    private JobRepository getJobRepository() throws Exception {
+    @Bean
+    public JobRepository getJobRepository() throws Exception {
         JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
         factory.setDataSource(dataSource());
-        factory.setTransactionManager(getTransactionManager(entityManagerFactory().getObject()));
+        factory.setTransactionManager(transactionManager(entityManagerFactory().getObject()));
         factory.afterPropertiesSet();
         return (JobRepository) factory.getObject();
     }
 
+    @Bean
     public JobLauncher getJobLauncher() throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
         jobLauncher.setJobRepository(getJobRepository());
         jobLauncher.afterPropertiesSet();
         return jobLauncher;
+    }
+
+    @Bean
+    public StepScope stepScope() {
+        StepScope stepScope = new StepScope();
+        stepScope.setAutoProxy(true);
+        return stepScope;
     }
 }
