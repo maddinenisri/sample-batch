@@ -2,8 +2,10 @@ package com.mdstech.sample.samplejob1;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.*;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -13,10 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 import javax.persistence.EntityManagerFactory;
 
+@Configuration
+@EnableBatchProcessing
 public class SampleJob1Config {
 
     @Autowired
@@ -25,7 +30,7 @@ public class SampleJob1Config {
     @Autowired
     private StepBuilderFactory steps;
 
-    @Value("input/record.csv")
+    @Value("input/samplejob1_data.csv")
     private Resource inputCsv;
 
     @Bean

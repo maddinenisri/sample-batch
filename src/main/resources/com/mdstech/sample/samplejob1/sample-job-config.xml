@@ -10,7 +10,7 @@
     <bean id="itemReader"
           class="org.springframework.batch.item.file.FlatFileItemReader">
 
-        <property name="resource" value="input/record.csv" />
+        <property name="resource" value="input/samplejob1_data.csv" />
 
         <property name="lineMapper">
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
